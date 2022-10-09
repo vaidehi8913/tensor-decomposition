@@ -83,7 +83,9 @@ class Heading extends Component {
         if (this.state.dropDown) {
             dropDownBox = 
             <div style={dropDownBoxStyle}> 
-                There is no info.
+                This visualizer is running perturbed gradient descent on the standard tensor decomposiotion
+                objective function (squared Frobenius norm of the difference of the ground truth tensor and 
+                the model tensor).  
             </div>;
         }
 

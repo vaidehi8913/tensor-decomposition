@@ -1,3 +1,4 @@
+import { Checkbox } from '@mui/material';
 
  // For easy one-value inputs 
  // Input: string, string, bool, number, function: number -> null
@@ -7,7 +8,7 @@ export const buildEntryBox = ((prelabel, postlabel, isInteger, currentValue, upd
         display: "flex",
         flexDirection: "row",
         gap: "5px"
-    }
+    };
 
     return(
         <div style={entryBoxWrapperStyle}>
@@ -19,6 +20,28 @@ export const buildEntryBox = ((prelabel, postlabel, isInteger, currentValue, upd
                     updateFunction(isInteger ? Math.floor(event.target.value) 
                                                 : event.target.value)}
                 style={{width: labelWidth}} />
+
+            {postlabel}
+        </div>
+    );
+});
+
+// Input: string, string, bool, function: () => ()
+// Output: component
+export const buildCheckBox = ((prelabel, postlabel, checked, updateFunction) => {
+    var wrapperStyle = {
+        display: "flex",
+        flexDirection: "row",
+        gap: "5px",
+        alignItems: "center"
+    };
+
+    return (
+        <div style={wrapperStyle}>
+            {prelabel}
+
+            <Checkbox checked={checked}
+                      onChange={updateFunction}/>
 
             {postlabel}
         </div>

@@ -37,6 +37,19 @@ class VectorIO extends Component {
                                                    this.props.dimension,
                                                    this.props.updateDimension);
 
+        if (this.props.order < 2) {
+            return (
+                <div style={topLevelWrapperStyle}>
+    
+                    {orderEntry}
+    
+                    {dimensionEntry}
+    
+                    Valid orders are at least 2.
+                </div>
+            );
+        }
+
         // var indexNames = [];
 
         // if (this.props.dimension == 2) {

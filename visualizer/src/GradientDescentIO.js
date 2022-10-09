@@ -14,10 +14,17 @@ import * as IOUtils from "./IOUtils";
     resetVectors
     dimension
     modelCurrentVectors
+    trace
+    updateTrace
+    off (deactivate the whole display)
 */
 class GradientDescentIO extends Component {
 
     render () {
+
+        if (this.props.off) {
+            return null;
+        }
 
         var topLevelWrapperStyle = {
             display: "flex",
@@ -39,6 +46,8 @@ class GradientDescentIO extends Component {
                                                           false,
                                                           this.props.perturbWithin,
                                                           this.props.updatePerturbWithin);
+
+        var traceCheckbox = IOUtils.buildCheckBox("", "Trace paths", this.props.trace, this.props.updateTrace);
 
         var controlRunButtonStyle = {width: "150"};
 
@@ -64,8 +73,6 @@ class GradientDescentIO extends Component {
 
         var vectorHeader = IOUtils.vectorHeader(this.props.dimension);
 
-
-
         var modelCurrentVectorDisplay = this.props.modelCurrentVectors.map((labeledVec) =>
             IOUtils.displayVectorValues(labeledVec)
         ); 
@@ -75,6 +82,7 @@ class GradientDescentIO extends Component {
                 {stepSizeEntryBox}
                 {tickTimeEntryBox}
                 {perturbWithinEntryBox}
+                {traceCheckbox}
                 {runResetButtonsTogether}
 
                 <b> Current model: </b>

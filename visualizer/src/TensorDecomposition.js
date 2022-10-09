@@ -21,7 +21,8 @@ class TensorDecomposition extends Component {
             stepSize: 0.01,
             tickTime: 1000,
             perturbWithin: 0.01,
-            trace: false,
+            doTrace: false,
+            // list of {trace: []} objects
             traces: []
         };
 
@@ -35,6 +36,7 @@ class TensorDecomposition extends Component {
         this.updateDimension = this.updateDimension.bind(this);
         this.updateStepSize = this.updateStepSize.bind(this);
         this.controlRun = this.controlRun.bind(this);
+        this.updateDoTrace = this.updateDoTrace.bind(this);
 
         this.updateGroundTruthVectors = this.updateGroundTruthVectors.bind(this);
         this.updateModelInitVectors = this.updateModelInitVectors.bind(this);
@@ -54,9 +56,15 @@ class TensorDecomposition extends Component {
     }
 
     resetVectors () {
+
+        var basicTraces = this.state.modelInitialVectors.map((vec) =>
+            ({trace: [vec]})
+        );
+
         this.setState({
             modelCurrentVectors: this.state.modelInitialVectors,
-            isRunning: false
+            isRunning: false,
+            traces: basicTraces
         });
     }
 
@@ -96,11 +104,16 @@ class TensorDecomposition extends Component {
             this.updateVectorDimension(vec, newDimension)
         );
 
+        var basicTraces = newModelInitVectors.map((vec) =>
+            ({trace: [vec]})
+        );
+
         this.setState({
             modelInitialVectors: newModelInitVectors,
             modelCurrentVectors: newModelInitVectors,
             groundTruthVectors: newGroundTruthVectors,
             dimension: newDimension,
+            trace: basicTraces,
             isRunning: false
         });
     }
@@ -134,9 +147,14 @@ class TensorDecomposition extends Component {
     }
 
     updateModelInitVectors(newModelInitVectors) {
+        var basicTraces = this.state.modelInitialVectors.map((vec) =>
+            ({trace: [vec]})
+        );
+
         this.setState({
             modelInitialVectors: newModelInitVectors,
             modelCurrentVectors: newModelInitVectors,
+            traces: basicTraces,
             isRunning: false
         });
     }
@@ -164,11 +182,36 @@ class TensorDecomposition extends Component {
         var newInitialVectorSet = this.state.modelInitialVectors.concat(newVector);
         //var newCurrentVectorSet = this.state.modelCurrentVectors.concat(newVector);
 
+        var basicTraces = newInitialVectorSet.map((vec) =>
+            ({trace: [vec]})
+        );
+
         this.setState({
             modelInitialVectors: newInitialVectorSet,
             modelCurrentVectors: newInitialVectorSet,
+            traces: basicTraces,
             isRunning: false
         });
+    }
+
+    updateDoTrace () {
+        var oldDoTrace = this.state.doTrace;
+
+        var basicTraces = this.state.modelInitialVectors.map((vec) =>
+            ({trace: [vec]})
+        );
+
+        if (oldDoTrace) {
+            this.setState({
+                doTrace: false,
+                traces: basicTraces
+            });
+        } else {
+            this.setState({
+                doTrace: true,
+                traces: basicTraces
+            });
+        }
     }
 
     // /* GRADIENT DESCENT MACHINERY */
@@ -236,8 +279,14 @@ class TensorDecomposition extends Component {
         console.log("perturbed new point");
         MatrixUtils.logLabeledVectorList(perturbedNewPoint);
 
+        var newTraces = perturbedNewPoint.map((labeledVec, vecIndex) => {
+            var oldTrace = this.state.traces[vecIndex].trace;
+            return ({trace: oldTrace.concat([labeledVec])});
+        });
+
         this.setState({
-            modelCurrentVectors: perturbedNewPoint
+            modelCurrentVectors: perturbedNewPoint,
+            traces: newTraces
         });
     }
 
@@ -281,7 +330,9 @@ class TensorDecomposition extends Component {
                 <div style={horizontalWrapperStyle} >
                     <VectorDrawing dimension={this.state.dimension}
                                    groundTruthVectors={this.state.groundTruthVectors}
-                                   modelVectors={this.state.modelCurrentVectors}/>
+                                   modelVectors={this.state.modelCurrentVectors}
+                                   traces={this.state.traces}
+                                   displayTraces={this.state.doTrace}/>
                     <VectorIO order={this.state.order}
                               updateOrder={this.updateOrder}
                               dimension={this.state.dimension}
@@ -302,7 +353,10 @@ class TensorDecomposition extends Component {
                                        controlRun={this.controlRun}
                                        resetVectors={this.resetVectors}
                                        dimension={this.state.dimension} 
-                                       modelCurrentVectors={this.state.modelCurrentVectors}/>
+                                       modelCurrentVectors={this.state.modelCurrentVectors}
+                                       trace={this.state.doTrace}
+                                       updateTrace={this.updateDoTrace}
+                                       off={(this.state.order < 2)}/>
                 </div>            
             </div>
         );

@@ -14,6 +14,8 @@ import * as MatrixUtils from "./MatrixUtils";
     dimension
     groundTruthVectors
     modelVectors
+    traces
+    displayTraces
 */
 class VectorDrawing extends Component {
 
@@ -24,7 +26,7 @@ class VectorDrawing extends Component {
         this.stageHeight = this.stageWidth;
         this.midX = this.stageWidth / 2;
         this.midY = this.stageHeight / 2;
-        this.scale = (this.stageWidth)/6; // length "1" in pixels
+        this.scale = (this.stageWidth) / 6; // length "1" in pixels
         this.zaxisX = -0.25;
         this.zaxisY = -0.25;
 
@@ -33,6 +35,7 @@ class VectorDrawing extends Component {
 
         this.project3Dto2D = this.project3Dto2D.bind(this);
         this.generatePointDrawing = this.generatePointDrawing.bind(this);
+        this.generateTraceDrawing = this.generateTraceDrawing.bind(this);
         this.getCanvasCoords = this.getCanvasCoords.bind(this);
     }  
 
@@ -146,7 +149,30 @@ class VectorDrawing extends Component {
         return (dropLineDrawings.concat(pointDrawing));
     }
 
+    generateTraceDrawing (oneTrace) {
+        var wayPointCoords = oneTrace.trace.map((labeledVec) => 
+            this.getCanvasCoords(labeledVec)
+        );
+
+        var lines = wayPointCoords.map((fromCoords, stepIndex) => {
+            if (stepIndex + 1 == wayPointCoords.length) return null;
+
+            var toCoords = wayPointCoords[stepIndex + 1];
+
+            return (
+                <Line points={fromCoords.concat(toCoords)}
+                      stroke="#00e013"
+                      strokewidth="0.5px"/>
+            );
+        });
+
+        return lines;
+    }
+
     render () {
+
+        console.log("rendering vectorDrawing");
+        console.log(this.props.traces);
 
         var vectorDisplayWrapperStyle = {
             display: "flex",
@@ -162,6 +188,14 @@ class VectorDrawing extends Component {
                     Drawing only supported for dimensions 2 and 3.
                 </div>
             );
+        }
+
+        if (this.props.displayTraces) {
+
+            console.log(this.props.traces);
+
+            var traceDrawingsUnflattened = this.props.traces.map(this.generateTraceDrawing);
+            var traceDrawings = traceDrawingsUnflattened.reduce((a, b) => a.concat(b), []);
         }
 
         var groundTruthPointDrawings = this.props.groundTruthVectors.map((labeledVec) =>
@@ -204,6 +238,10 @@ class VectorDrawing extends Component {
                 <Stage width={this.stageWidth} height={this.stageHeight}>
                     <Layer>
                         {axisDrawings}
+                    </Layer>
+
+                    <Layer>
+                        {traceDrawings}
                     </Layer>
 
                     <Layer>
