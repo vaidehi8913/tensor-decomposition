@@ -19,6 +19,24 @@ import * as IOUtils from "./IOUtils";
 */
 class VectorIO extends Component {
 
+    constructor(props) {
+        super(props);
+
+        this.randomizeModelVectors = this.randomizeModelVectors.bind(this);
+    }
+
+    randomizeModelVectors() {
+        var randomModelVectors = this.props.modelInitialVectors.map((labeledVec) => {
+            var randomVec = labeledVec.vec.map((entry) => 2 * Math.random() - 1);
+            return ({
+                label: labeledVec.label,
+                vec: randomVec
+            });
+        });
+
+        this.props.updateModelInitialVectors(randomModelVectors);
+    }
+
     render () {
 
         var topLevelWrapperStyle = {
@@ -50,18 +68,6 @@ class VectorIO extends Component {
             );
         }
 
-        // var indexNames = [];
-
-        // if (this.props.dimension == 2) {
-        //     indexNames = ["x", "y"];
-        // }
-
-        // if (this.props.dimension == 3) {
-        //     indexNames = ["x", "y", "z"];
-        // }
-
-        // var vectorHeader = IOUtils.formatDataRow("Label", indexNames);
-
         var vectorHeader = IOUtils.vectorHeader(this.props.dimension);
 
         var groundTruthVectorInputs = this.props.groundTruthVectors.map((gtVec, gtVecIndex) => 
@@ -92,6 +98,18 @@ class VectorIO extends Component {
                 Add vector
             </button>;
 
+        var randomizeMIVectorsButton = 
+            <button onClick={this.randomizeModelVectors}
+                    style={addVectorButtonStyle}>
+                Randomize
+            </button>;
+
+        var MIButtonsTogether = 
+            <div style={{display: "flex", flexDirection: "row", gap: "20px"}}>
+                {addMIVectorButton}
+                {randomizeMIVectorsButton}
+            </div>;
+
         return (
             <div style={topLevelWrapperStyle}>
 
@@ -113,7 +131,7 @@ class VectorIO extends Component {
 
                 {modelInitialVectorInputs}
 
-                {addMIVectorButton}
+                {MIButtonsTogether}
             </div>
         );
     }

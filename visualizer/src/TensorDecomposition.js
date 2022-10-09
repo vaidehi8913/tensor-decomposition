@@ -147,7 +147,7 @@ class TensorDecomposition extends Component {
     }
 
     updateModelInitVectors(newModelInitVectors) {
-        var basicTraces = this.state.modelInitialVectors.map((vec) =>
+        var basicTraces = newModelInitVectors.map((vec) =>
             ({trace: [vec]})
         );
 
