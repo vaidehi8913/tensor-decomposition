@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/tensor-decomposition/static/css/main.e6c13ad2.css",
+    "main.js": "/tensor-decomposition/static/js/main.2455c305.js",
+    "index.html": "/tensor-decomposition/index.html",
+    "main.e6c13ad2.css.map": "/tensor-decomposition/static/css/main.e6c13ad2.css.map",
+    "main.2455c305.js.map": "/tensor-decomposition/static/js/main.2455c305.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e6c13ad2.css",
+    "static/js/main.2455c305.js"
+  ]
+}
