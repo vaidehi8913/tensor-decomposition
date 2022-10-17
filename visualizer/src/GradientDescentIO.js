@@ -17,6 +17,7 @@ import * as IOUtils from "./IOUtils";
     trace
     updateTrace
     off (deactivate the whole display)
+    objectiveValue
 */
 class GradientDescentIO extends Component {
 
@@ -76,6 +77,9 @@ class GradientDescentIO extends Component {
         var modelCurrentVectorDisplay = this.props.modelCurrentVectors.map((labeledVec) =>
             IOUtils.displayVectorValues(labeledVec)
         ); 
+
+        var objectiveValueComponent  = 
+            <b> Objective value: {Number(this.props.objectiveValue).toFixed(4)}</b>;
         
         return (
             <div style={topLevelWrapperStyle}>
@@ -89,7 +93,7 @@ class GradientDescentIO extends Component {
                 {vectorHeader}
                 {modelCurrentVectorDisplay}
 
-                <b>Objective value: ???</b>
+                {objectiveValueComponent}
             </div>
         );
     }

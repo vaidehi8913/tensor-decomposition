@@ -40,7 +40,7 @@ export const scalarVectorMult = ((scale, vec) =>
 // Input: unlabeled vector, unlabeled vector
 // Output: scalar
 // Exception: if inputs are not the same dimension
-export const innerProduct = ((v1, v2) =>
+export const vectorInnerProduct = ((v1, v2) =>
     {
         if (v1.length != v2.length) {
             throw "Vectors incompatible for inner product";
@@ -77,7 +77,7 @@ export const matrixMultiply = ((m1, m2) =>
                 var productRow = m1Row.map((ignore, columnIndex) =>
                     {
                         var m2Col = extractColumn(m2, columnIndex);
-                        return innerProduct(m1Row, m2Col);
+                        return vectorInnerProduct(m1Row, m2Col);
                     }
                 );
 
@@ -132,6 +132,26 @@ export const moveAgainstGradient = ((currentPoint, grad, stepSize) =>
         return newWrappedVectors;
     }
 );
+
+/* TENSORS */
+
+// Input: labeled vector list, labeled vector list
+// Output: number
+export const tensorInnerProduct = ((AVectors, YVectors, order) => {
+    var outerSums = AVectors.map((Ai) => {
+
+        var innerProdList = YVectors.map((Yj) => {
+            var innerProd = vectorInnerProduct(Ai.vec, Yj.vec);
+
+            return Math.pow(innerProd, order);  
+        });
+
+        return innerProdList.reduce((a, b) => a + b, 0);
+
+    });
+
+    return outerSums.reduce((a, b) => a + b, 0);
+})
 
 /* LOGGING */
 

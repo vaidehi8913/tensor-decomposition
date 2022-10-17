@@ -117,10 +117,10 @@ class VectorDrawing extends Component {
             dropLineDrawings = [
                 <Line points={pointCoords.concat(xParallelLineEndCanvasCoords)}
                       stroke={pointColor}
-                      strokeWidth={"1px"}/>,
+                      strokeWidth={1}/>,
                 <Line points={pointCoords.concat(yParallelLineEndCanvasCoords)}
                       stroke={pointColor}
-                      strokeWidth={"1px"}/>
+                      strokeWidth={1}/>
             ];
         } 
         
@@ -136,13 +136,13 @@ class VectorDrawing extends Component {
             dropLineDrawings = [
                 <Line points={pointCoords.concat(xParallelLineEndCanvasCoords)}
                       stroke={pointColor}
-                      strokeWidth={"1px"}/>,
+                      strokeWidth={1}/>,
                 <Line points={pointCoords.concat(yParallelLineEndCanvasCoords)}
                       stroke={pointColor}
-                      strokeWidth={"1px"}/>,
+                      strokeWidth={1}/>,
                 <Line points={pointCoords.concat(zParallelLineEndCanvasCoords)}
                       stroke={pointColor}
-                      strokeWidth={"1px"}/>
+                      strokeWidth={1}/>
             ];
         }
 
@@ -162,7 +162,7 @@ class VectorDrawing extends Component {
             return (
                 <Line points={fromCoords.concat(toCoords)}
                       stroke="#00e013"
-                      strokewidth="0.5px"/>
+                      strokewidth={1}/>
             );
         });
 

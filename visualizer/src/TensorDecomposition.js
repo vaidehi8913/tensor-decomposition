@@ -18,12 +18,13 @@ class TensorDecomposition extends Component {
             groundTruthVectors: [],
             modelCurrentVectors: [],
             isRunning: false,
-            stepSize: 0.01,
+            stepSize: 0.05,
             tickTime: 1000,
-            perturbWithin: 0.01,
-            doTrace: false,
+            perturbWithin: 0.001,
+            doTrace: true,
             // list of {trace: []} objects
-            traces: []
+            traces: [],
+            objectiveValue: null
         };
 
         this.interval = setInterval(() => this.tick(), 1000);
@@ -44,14 +45,23 @@ class TensorDecomposition extends Component {
         this.addNewGroundTruthVector = this.addNewGroundTruthVector.bind(this);
 
         this.calculateGradient = this.calculateGradient.bind(this);
+        this.calculateObjectiveValue = this.calculateObjectiveValue.bind(this);
         this.stepGradientDescent = this.stepGradientDescent.bind(this);
     }
 
     /* SETTING AND UPDATING STATE */
 
     updateOrder (newOrder) {
+
+        var newObjectiveValue = this.calculateObjectiveValue(
+            this.state.groundTruthVectors,
+            this.state.modelCurrentVectors,
+            newOrder
+        );
+
         this.setState({
-            order: newOrder
+            order: newOrder,
+            objectiveValue: newObjectiveValue
         });
     }
 
@@ -61,10 +71,17 @@ class TensorDecomposition extends Component {
             ({trace: [vec]})
         );
 
+        var objectiveValue = this.calculateObjectiveValue(
+            this.state.groundTruthVectors,
+            this.state.modelInitialVectors,
+            this.state.order
+        );
+
         this.setState({
             modelCurrentVectors: this.state.modelInitialVectors,
             isRunning: false,
-            traces: basicTraces
+            traces: basicTraces,
+            objectiveValue: objectiveValue
         });
     }
 
@@ -108,13 +125,20 @@ class TensorDecomposition extends Component {
             ({trace: [vec]})
         );
 
+        var objectiveValue = this.calculateObjectiveValue(
+            newGroundTruthVectors,
+            newModelInitVectors,
+            this.state.order
+        );
+
         this.setState({
             modelInitialVectors: newModelInitVectors,
             modelCurrentVectors: newModelInitVectors,
             groundTruthVectors: newGroundTruthVectors,
             dimension: newDimension,
             trace: basicTraces,
-            isRunning: false
+            isRunning: false,
+            objectiveValue: objectiveValue
         });
     }
 
@@ -140,9 +164,17 @@ class TensorDecomposition extends Component {
     }
 
     updateGroundTruthVectors(newGroundTruthVectors) {
+
+        var objectiveValue = this.calculateObjectiveValue(
+            newGroundTruthVectors,
+            this.state.modelCurrentVectors,
+            this.state.order
+        );
+
         this.setState({
             groundTruthVectors: newGroundTruthVectors,
-            isRunning: false
+            isRunning: false,
+            objectiveValue: objectiveValue
         });
     }
 
@@ -151,11 +183,18 @@ class TensorDecomposition extends Component {
             ({trace: [vec]})
         );
 
+        var objectiveValue = this.calculateObjectiveValue(
+            this.state.groundTruthVectors,
+            newModelInitVectors,
+            this.state.order
+        );
+
         this.setState({
             modelInitialVectors: newModelInitVectors,
             modelCurrentVectors: newModelInitVectors,
             traces: basicTraces,
-            isRunning: false
+            isRunning: false,
+            objectiveValue: objectiveValue
         });
     }
 
@@ -229,7 +268,7 @@ class TensorDecomposition extends Component {
                     {
                         var Aj = AjWrapper.vec; 
 
-                        var scalar = Math.pow(MatrixUtils.innerProduct(Aj, Yi), this.state.order - 1);
+                        var scalar = Math.pow(MatrixUtils.vectorInnerProduct(Aj, Yi), this.state.order - 1);
 
                         return MatrixUtils.scalarVectorMult(scalar, Aj);
                     }
@@ -243,7 +282,7 @@ class TensorDecomposition extends Component {
                     {
                         var Yj = YjWrapper.vec; 
 
-                        var scalar = Math.pow(MatrixUtils.innerProduct(Yj, Yi), this.state.order - 1);
+                        var scalar = Math.pow(MatrixUtils.vectorInnerProduct(Yj, Yi), this.state.order - 1);
 
                         return MatrixUtils.scalarVectorMult(scalar, Yj);
                     }
@@ -259,6 +298,17 @@ class TensorDecomposition extends Component {
         );
 
         return grad;
+    }
+
+    calculateObjectiveValue (AVectors, YVectors, order) {
+        
+        var AFrobNorm = MatrixUtils.tensorInnerProduct(AVectors, AVectors, order);
+
+        var crossTerm = MatrixUtils.tensorInnerProduct(AVectors, YVectors, order);
+
+        var YFrobNorm = MatrixUtils.tensorInnerProduct(YVectors, YVectors, order);
+
+        return AFrobNorm - 2 * crossTerm + YFrobNorm;
     }
 
     stepGradientDescent() {
@@ -284,9 +334,16 @@ class TensorDecomposition extends Component {
             return ({trace: oldTrace.concat([labeledVec])});
         });
 
+        var newObjectiveValue = this.calculateObjectiveValue(
+            this.state.groundTruthVectors, 
+            perturbedNewPoint, 
+            this.state.order
+        );
+
         this.setState({
             modelCurrentVectors: perturbedNewPoint,
-            traces: newTraces
+            traces: newTraces,
+            objectiveValue: newObjectiveValue
         });
     }
 
@@ -356,7 +413,8 @@ class TensorDecomposition extends Component {
                                        modelCurrentVectors={this.state.modelCurrentVectors}
                                        trace={this.state.doTrace}
                                        updateTrace={this.updateDoTrace}
-                                       off={(this.state.order < 2)}/>
+                                       off={(this.state.order < 2)}
+                                       objectiveValue={this.state.objectiveValue}/>
                 </div>            
             </div>
         );
