@@ -23,6 +23,7 @@ class VectorIO extends Component {
         super(props);
 
         this.randomizeModelVectors = this.randomizeModelVectors.bind(this);
+        this.randomizeGroundTruthVectors = this.randomizeGroundTruthVectors.bind(this);
     }
 
     randomizeModelVectors() {
@@ -35,6 +36,18 @@ class VectorIO extends Component {
         });
 
         this.props.updateModelInitialVectors(randomModelVectors);
+    }
+
+    randomizeGroundTruthVectors() {
+        var randomGroundTruthVectors = this.props.groundTruthVectors.map((labeledVec) => {
+            var randomVec = labeledVec.vec.map((entry) => 2 * Math.random() - 1);
+            return ({
+                label: labeledVec.label,
+                vec: randomVec
+            });
+        });
+
+        this.props.updateGroundTruthVectors(randomGroundTruthVectors);
     }
 
     render () {
@@ -92,6 +105,18 @@ class VectorIO extends Component {
                 Add vector
             </button>;
 
+        var randomizeGTVectorsButton = 
+            <button onClick={this.randomizeGroundTruthVectors}
+                    style={addVectorButtonStyle}>
+                Randomize
+            </button>;
+
+        var GTButtonsTogether = 
+            <div style={{display: "flex", flexDirection: "row", gap: "20px"}}>
+                {addGTVectorButton}
+                {randomizeGTVectorsButton}
+            </div>;
+
         var addMIVectorButton = 
             <button onClick={this.props.addNewModelVector}
                     style={addVectorButtonStyle}>
@@ -123,7 +148,7 @@ class VectorIO extends Component {
 
                 {groundTruthVectorInputs}
 
-                {addGTVectorButton}
+                {GTButtonsTogether}
 
                 <b> Model vectors (initial): </b>
 
