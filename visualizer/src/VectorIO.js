@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import * as IOUtils from "./IOUtils";
+import * as MatrixUtils from "./MatrixUtils";
 
 /*
     PROPS
@@ -24,6 +25,7 @@ class VectorIO extends Component {
 
         this.randomizeModelVectors = this.randomizeModelVectors.bind(this);
         this.randomizeGroundTruthVectors = this.randomizeGroundTruthVectors.bind(this);
+        this.perturbGroundTruthVectors = this.perturbGroundTruthVectors.bind(this);
     }
 
     randomizeModelVectors() {
@@ -48,6 +50,12 @@ class VectorIO extends Component {
         });
 
         this.props.updateGroundTruthVectors(randomGroundTruthVectors);
+    }
+
+    perturbGroundTruthVectors() {
+        var perturbedVecs = MatrixUtils.perturbVectors(this.props.groundTruthVectors, 0.001);
+
+        this.props.updateGroundTruthVectors(perturbedVecs);
     }
 
     render () {
@@ -111,10 +119,17 @@ class VectorIO extends Component {
                 Randomize
             </button>;
 
+        var perturbGTVectorsButton = 
+            <button onClick={this.perturbGroundTruthVectors}
+                style={addVectorButtonStyle}>
+                Perturb
+        </button>;
+
         var GTButtonsTogether = 
             <div style={{display: "flex", flexDirection: "row", gap: "20px"}}>
                 {addGTVectorButton}
                 {randomizeGTVectorsButton}
+                {perturbGTVectorsButton}
             </div>;
 
         var addMIVectorButton = 
